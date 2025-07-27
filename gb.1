@@ -1,0 +1,93 @@
+.TH GB 1 "July 2025" "Grid Bot 1.0" "User Commands"
+
+.SH NAME
+gb \- real-time grid trading bot for stdin/stdout streaming
+
+.SH SYNOPSIS
+.B gb
+[\-c center] [\-l levels] [\-s spacing] [\-q quantity] [\-d]
+
+.SH DESCRIPTION
+.B gb
+is a lightweight, suckless-aligned, real-time grid trading bot that reads price data from standard input and emits order activity, fills, and strategy state to standard output.
+
+All configuration is passed via command-line options, and the program operates as a single binary with no external dependencies, sockets, or persistent state.
+
+.SH OPTIONS
+.TP
+.B \-c
+Set the center price for the grid (default: 100.0).
+.TP
+.B \-l
+Number of grid levels per side (default: 5).
+.TP
+.B \-s
+Grid spacing between levels (default: 1.0).
+.TP
+.B \-q
+Quantity per order (default: 1.0).
+.TP
+.B \-d
+Enable debug mode. Prints full strategy status after each tick.
+.TP
+.B \-h
+Print usage help and exit.
+
+.SH INPUT
+The program expects newline-delimited price ticks via standard input:
+.PP
+.EX
+98.5
+99.0
+100.2
+.EE
+
+.SH OUTPUT
+For each tick, gb prints a status report including:
+.TP
+.B Order fills:
+e.g., "Filled BUY 98.00 x 1.00"
+.TP
+.B New orders:
+Automatically placed grid orders above/below fill prices.
+.TP
+.B PnL and Position:
+Realized profit and open quantity (only shown if
+.B -d
+is specified).
+
+.SH EXAMPLES
+Basic usage:
+.PP
+.EX
+$ ./gb -c 100 -l 3 -s 1 -q 1 < prices.txt
+.EE
+
+Enable debug mode:
+.PP
+.EX
+$ ./gb -c 100 -l 3 -s 1 -q 1 -d
+.EE
+
+Pipe live price data:
+.PP
+.EX
+$ while true; do get_price; sleep 1; done | ./gb -c 90 -l 4 -s 0.5 -q 1 -d
+.EE
+
+.SH FILES
+None. All interaction is via standard input/output.
+
+.SH LIMITATIONS
+This implementation performs no order matching, persistence, or time-aware logic. Backtesting and visualizations should be performed externally.
+
+.SH SEE ALSO
+.BR backtesting (1),
+.BR awk (1),
+.BR python (1)
+
+.SH AUTHOR
+Michael Czigler <mczigler@example.com>
+
+.SH LICENSE
+BSD 3-Clause License. See LICENSE file for details.
